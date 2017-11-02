@@ -12,10 +12,15 @@ import (
 	"encoding/json"
 )
 
-const exchange = "klim.actor"
+type Queue struct {
+	SyncObject domain.Entity
+	ImportFileName string
+	Exchange string
+	FeedCount int
+}
 
-func DoActor(feedCount int) {
-	actorFile, err := ioutil.ReadFile("./resources/actor.csv")
+func (q Queue) ReadAndPublish() {
+	actorFile, err := ioutil.ReadFile(q.ImportFileName)
 	util.FailOnError(err,"Could not find the resource file")
 
 	conn := Connect()
@@ -25,11 +30,11 @@ func DoActor(feedCount int) {
 	util.FailOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	Declare(ch, exchange)
+	Declare(ch, q.Exchange)
 
 	r := csv.NewReader(strings.NewReader(string(actorFile)))
 	i := 0
-	for i < feedCount {
+	for i < q.FeedCount {
 		record, err := r.Read()
 		if err == io.EOF {
 			break
@@ -39,11 +44,10 @@ func DoActor(feedCount int) {
 		}
 		fmt.Println(record)
 
-		actor := &domain.Actor{}
-		actor.Import(record)
-		body, err := json.Marshal(actor)
+		q.SyncObject.Import(record)
+		body, err := json.Marshal(q.SyncObject)
 		util.FailOnError(err, "Could not convert the object to json")
-		Publish(ch, exchange, body)
+		Publish(ch, q.Exchange, body)
 
 		i = i + 1
 	}

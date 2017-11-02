@@ -82,3 +82,7 @@ type PlanRequest struct {
 	CreatedAt time.Time
 	IntersectedAt time.Time
 }
+
+func (pr *PlanRequest) Import(data []string) {
+
+}

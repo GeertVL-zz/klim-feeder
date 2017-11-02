@@ -7,6 +7,7 @@ import (
 	"github.com/geertvl/klim-feeder/queue"
 	"strconv"
 	"github.com/geertvl/klim-feeder/util"
+	"github.com/geertvl/klim-feeder/domain"
 )
 
 func main() {
@@ -28,7 +29,14 @@ func main() {
 
  	switch importType {
 	case "1":
-		queue.DoActor(publishCount)
+		q := queue.Queue{ SyncObject: &domain.Actor{}, ImportFileName: "./resources/actor.csv", Exchange:"klim.actor", FeedCount: publishCount  }
+		q.ReadAndPublish()
+	case "2":
+		q := queue.Queue{ SyncObject: &domain.PlanRequest{}, ImportFileName: "./resources/planrequest.csv", Exchange: "klim.planrequest", FeedCount: publishCount }
+		q.ReadAndPublish()
+	case "3":
+		q := queue.Queue{ SyncObject: &domain.Mail{}, ImportFileName: "", Exchange: "klim.mail", FeedCount: publishCount }
+		q.ReadAndPublish()
 	default:
 		fmt.Println("This option is not known")
 	}
