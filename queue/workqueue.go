@@ -7,7 +7,7 @@ import (
 )
 
 func Connect() *amqp.Connection {
-	conn, err := amqp.Dial("amqp://rabbitmq:rabbitmq@localhost:5672")
+	conn, err := amqp.Dial("amqp://rabbitmq:rabbitmq@rabbit:5672")
 	util.FailOnError(err, "Failed to connect to RabbitMQ")
 
 	return conn
